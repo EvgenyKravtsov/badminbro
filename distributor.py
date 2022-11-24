@@ -1,3 +1,4 @@
+# Denis test
 def distribute_players_for_games(players):
     games_count = 8
 
