@@ -30,16 +30,14 @@ def rank(update, context):
     replied_message = update.effective_message.reply_to_message.text
     players = __parse_players_from_replied_message(replied_message)
 
-    player_numbers_to_rank = update.effective_message.text.replace(
-        "/rank", "").strip().split(",")
+    player_numbers_to_rank = update.effective_message.text.split(" ")[1]
 
-    def player_number_to_ranked_player(player_number_to_rank):
-        number = player_number_to_rank[0]
-        result_code = player_number_to_rank[-1]  # W for win, L for loss
-
+    rankedPlayers = []
+    for i, player_number_to_rank in enumerate(player_numbers_to_rank):
         for player in players:
-            if (player.number) == number:
-                return ranking_engine.RankedPlayer(player, result_code == "W")
+            if (player.number) == player_number_to_rank:
+                rankedPlayers.append(
+                    ranking_engine.RankedPlayer(player, i <= 1))
 
     storageInstance = None
     if (debug):
@@ -47,8 +45,8 @@ def rank(update, context):
     else:
         storageInstance = storage.HerokuPostgresDatabase()
 
-    displayable_updated_ratings = ranking_engine.rank_players(rankedPlayers=list(
-        map(player_number_to_ranked_player, player_numbers_to_rank)), storage=storageInstance)
+    displayable_updated_ratings = ranking_engine.rank_players(
+        rankedPlayers, storage=storageInstance)
 
     context.bot.send_message(chat_id=chat_id, text=displayable_updated_ratings)
 
