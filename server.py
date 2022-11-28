@@ -2,6 +2,7 @@ from flask import Flask
 from flask import Response
 from flask_cors import CORS
 import json
+import os
 
 debug = False
 
@@ -25,4 +26,5 @@ def run_server(storage):
             app.run(port=8000)
     else:
         if __name__ == 'server':
-            app.run()
+            port = int(os.environ.get("PORT", 5000))
+            app.run(host='0.0.0.0', port=port)
