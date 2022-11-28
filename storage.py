@@ -6,6 +6,10 @@ import psycopg2
 class Storage(ABC):
 
     @abstractmethod
+    def get_players():
+        pass
+
+    @abstractmethod
     def get_player_rating(player_name):
         pass
 
@@ -15,6 +19,17 @@ class Storage(ABC):
 
 
 class LocalPostgresDatabase(Storage):
+
+    def get_players(self):
+        connection = self.__connect()
+
+        try:
+            cursor = connection.cursor()
+            cursor.execute("SELECT * FROM players")
+            return cursor.fetchall()
+        finally:
+            if connection is not None:
+                connection.close()
 
     def get_player_rating(self, player_name):
         connection = self.__connect()
@@ -62,6 +77,17 @@ class LocalPostgresDatabase(Storage):
 
 
 class HerokuPostgresDatabase(Storage):
+
+    def get_players():
+        connection = self.__connect()
+
+        try:
+            cursor = connection.cursor()
+            cursor.execute("SELECT * FROM players")
+            return cursor.fetchall()
+        finally:
+            if connection is not None:
+                connection.close()
 
     def get_player_rating(self, player_name):
         connection = self.__connect()
