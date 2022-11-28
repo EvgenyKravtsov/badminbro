@@ -25,4 +25,4 @@ def run_server(storage):
             app.run(port=8000)
     else:
         if __name__ == 'server':
-            app.run()
+            app.run(port=8000)
