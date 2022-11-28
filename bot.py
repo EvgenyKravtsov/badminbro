@@ -69,8 +69,7 @@ dispatcher.add_handler(CommandHandler("start", start))
 dispatcher.add_handler(CommandHandler("rank", rank))
 
 if (debug):
-    #updater.start_polling()
-    n = 0
+    updater.start_polling()
 else:
     updater.start_webhook(listen="0.0.0.0",
                           port=int(os.environ.get('PORT', 5000)),
@@ -78,7 +77,12 @@ else:
                           webhook_url="https://badminbro.herokuapp.com/" + badminbro_bot_token
                           )
 
-server.run_server(storage.LocalPostgresDatabase())
+storageInstance = None
+if (debug):
+    storageInstance = storage.LocalPostgresDatabase()
+else:
+    storageInstance = storage.HerokuPostgresDatabase()
+server.run_server(storageInstance)
 
 
 class Player:
