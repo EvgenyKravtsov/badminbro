@@ -12,7 +12,7 @@ badminbro_bot_token = "5898643664:AAG7eDcktsFFNQAwK1DE5I6uBcK0TlAMQUQ"
 updater = Updater(token=badminbro_bot_token, use_context=True)
 dispatcher = updater.dispatcher
 
-debug = True
+debug = False
 
 
 def start(update, context):
