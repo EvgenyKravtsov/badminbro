@@ -5,7 +5,7 @@ from telegram.ext import CommandHandler
 import distributor
 import ranking_engine
 import storage
-import server
+from server import run_server
 
 badminbro_bot_token = "5898643664:AAG7eDcktsFFNQAwK1DE5I6uBcK0TlAMQUQ"
 
@@ -82,7 +82,7 @@ if (debug):
     storageInstance = storage.LocalPostgresDatabase()
 else:
     storageInstance = storage.HerokuPostgresDatabase()
-server.run_server(storageInstance)
+run_server(storageInstance)
 
 
 class Player:

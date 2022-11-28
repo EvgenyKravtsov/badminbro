@@ -2,7 +2,8 @@ from flask import Flask
 from flask import Response
 from flask_cors import CORS
 import json
-import bot
+
+debug = False
 
 
 def run_server(storage):
@@ -19,7 +20,7 @@ def run_server(storage):
 
         return Response(players_json, mimetype='application/json')
 
-    if (bot.debug):
+    if (debug):
         if __name__ == 'server':
             app.run(port=8000)
     else:
