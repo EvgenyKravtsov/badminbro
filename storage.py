@@ -78,7 +78,7 @@ class LocalPostgresDatabase(Storage):
 
 class HerokuPostgresDatabase(Storage):
 
-    def get_players():
+    def get_players(self):
         connection = self.__connect()
 
         try:
