@@ -68,14 +68,14 @@ def __parse_players_from_replied_message(replied_message):
 dispatcher.add_handler(CommandHandler("start", start))
 dispatcher.add_handler(CommandHandler("rank", rank))
 
-if (debug):
-    updater.start_polling()
-else:
-    updater.start_webhook(listen="0.0.0.0",
-                          port=int(os.environ.get('PORT', 5000)),
-                          url_path=badminbro_bot_token,
-                          webhook_url="https://badminbro.herokuapp.com/" + badminbro_bot_token
-                          )
+# if (debug):
+#     updater.start_polling()
+# else:
+#     updater.start_webhook(listen="0.0.0.0",
+#                           port=int(os.environ.get('PORT', 5000)),
+#                           url_path=badminbro_bot_token,
+#                           webhook_url="https://badminbro.herokuapp.com/" + badminbro_bot_token
+#                           )
 
 storageInstance = None
 if (debug):
