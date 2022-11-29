@@ -14,13 +14,41 @@ def generate_random_player():
     rank = random.randint(1450, 1950)
     return Player(rank, name)
 
+def get_players_list():
+    print()
+    while True:
+        request = input('How many players in game (4 - 20)?: ')
+        if request.isnumeric():
+            num = int(request)
+            if num < 4:
+                print()
+                print('Too little :(')
+                print()
+            elif num > 20:
+                print()
+                print('Too much :(')
+                print()
+            else:
+                num_players_in_game = num
+                break
+        else:
+            print()
+            print('Please, insert a number.')
+            print()
+
+    players = [generate_random_player() for _ in range(num_players_in_game)]
+
+    print()
+    print('PLAYERS:')
+    for player in players:
+        print(player.name, ': ', player.rank, sep='')
+    print()
+
+    return players
 
 
 
-num_players = 10
+players = get_players_list()
 
-players = [generate_random_player() for _ in range(num_players)]
-
-for player in players:
-    print(player.name, ': ', player.rank, sep='')
+# sorting
 
