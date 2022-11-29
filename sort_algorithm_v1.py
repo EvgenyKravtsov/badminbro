@@ -3,10 +3,10 @@ import string
 import itertools
 
 class Player:
-    def __init__(self, rank, name, local_games):
+    def __init__(self, rank, name, local_games_count):
         self.rank = rank
         self.name = name
-        self.local_games = local_games
+        self.local_games_count = local_games_count
 
 def generate_random_player():
     name_length = random.randint(4, 7)
@@ -48,11 +48,12 @@ def get_players_list():
 
     return players
 
-def sorting_players_for_local_game():
+def sorting_players_for_local_game(players):
     players_in_game = [players[i] for i in range(4)] # list of players in current game
     players_number_in_game = [0, 1, 2, 3] # list for creating permutation set
 
     while True:
+        # find rank balance between teams
         team_rank_diff = abs((players_in_game[0].rank + players_in_game[1].rank) - (players_in_game[2].rank + players_in_game[3].rank))
         perm_set = itertools.permutations(players_number_in_game)
         for i in perm_set:
@@ -69,32 +70,34 @@ def sorting_players_for_local_game():
 
         # update local games count
         for number in players_number_in_game:
-            players[number].local_games += 1
+            players[number].local_games_count += 1
 
+        # update players in rest list
         max_games = -1
         go_rest_players_numbers_list = []
         for _ in range(2):
             for number in players_number_in_game:
-                if players[number].local_games > max_games:
-                    max_games = players[number].local_games
+                if players[number].local_games_count > max_games:
+                    max_games = players[number].local_games_count
             for number in players_number_in_game:
-                if players[number].local_games == max_games:
+                if players[number].local_games_count == max_games:
                     go_rest_player = players_number_in_game.pop(players_number_in_game.index(number))
                     go_rest_players_numbers_list.append(go_rest_player)
                     break
 
         # find players with min local games count
         two_min_games_count = []
-        all_games_count = [player.local_games for player in players]
+        all_games_count = [player.local_games_count for player in players]
         for _ in range(2):
             min_count = min(all_games_count)
             two_min_games_count.append(all_games_count.pop(all_games_count.index(min_count)))
 
         players_number_in_rest = [i for i in range(len(players)) if i != players_number_in_game[0] and i != players_number_in_game[1]]
 
+        # update players in game list
         while len(two_min_games_count) > 0:
             for i in range (len(players_number_in_rest)):
-                if players[players_number_in_rest[i]].local_games == two_min_games_count[0]:
+                if players[players_number_in_rest[i]].local_games_count == two_min_games_count[0]:
                     players_number_in_game.append(players_number_in_rest[i])
                     del two_min_games_count[0]
                     if len(two_min_games_count) == 0:
@@ -104,14 +107,13 @@ def sorting_players_for_local_game():
 
         print('PLAYERS:')
         for player in players:
-            print(player.name, ': ', player.local_games, sep='')
+            print(player.name, ': ', player.local_games_count, sep='')
         print()
 
         input('Press ENTER to continue...')
         print()
 
+
 players = get_players_list()
-sorting_players_for_local_game()
 
-
-
+sorting_players_for_local_game(players)
