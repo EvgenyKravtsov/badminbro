@@ -110,7 +110,9 @@ def sorting_players_for_local_game(players):
             print(player.name, ': ', player.local_games_count, sep='')
         print()
 
-        input('Press ENTER to continue...')
+        continue_game = input('Next game? y/n: ')
+        if continue_game == 'n':
+            break
         print()
 
 
