@@ -24,12 +24,8 @@ def run_server(storage, live_game):
 
     @app.route('/get_live_game_players')
     def get_live_game_players():
-        players = []
-        for player_tuple in live_game.players:
-            players.append(model.Player(player_tuple[0], player_tuple[1]))
-
+        players = live_game.players
         players_json = json.dumps([ob.__dict__ for ob in players])
-
         return Response(players_json, mimetype='application/json')
 
     @app.route('/add_player_to_live_game')
@@ -52,11 +48,7 @@ def run_server(storage, live_game):
     @app.route('/start_live_game')
     def start_live_game():
         players = live_game.start()
-        # for player_tuple in live_game.start():
-        #     players.append(model.Player(player_tuple[0], player_tuple[1]))
-
         players_json = json.dumps([ob.__dict__ for ob in players])
-
         return Response(players_json, mimetype='application/json')
 
     if (debug):
