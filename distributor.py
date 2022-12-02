@@ -2,9 +2,26 @@ import itertools
 
 
 def distribute_players_for_match(players):
-    players_in_game = [players[i]
-                       for i in range(4)]  # list of players in current game
-    players_number_in_game = [0, 1, 2, 3]  # list for creating permutation set
+    players_in_game = []  # list of players in current game
+    players_number_in_game = []  # list for creating permutation set
+
+    # find players with min games played in a row
+    four_min_games_count = []
+    all_games_count = [player.games_played_in_a_row for player in players]
+    for _ in range(4):
+        min_count = min(all_games_count)
+        four_min_games_count.append(all_games_count.pop(
+            all_games_count.index(min_count)))
+
+    # update players in game list
+    while len(four_min_games_count) > 0:
+        for i in range(len(players)):
+            if players[players[i]].games_played_in_a_row == four_min_games_count[0]:
+                players_in_game.append(i)
+                players_number_in_game.append(players[i])
+                del four_min_games_count[0]
+                if len(four_min_games_count) == 0:
+                    break
 
     # find rank balance between teams
     team_rating_diff = abs((players_in_game[0].rating + players_in_game[1].rating) - (
