@@ -1,12 +1,16 @@
-from abc import ABC, abstractmethod
 import os
 import psycopg2
+from abc import ABC, abstractmethod
 
 
 class Storage(ABC):
 
     @abstractmethod
     def get_players():
+        pass
+
+    @abstractmethod
+    def get_player(player_name):
         pass
 
     @abstractmethod
@@ -27,6 +31,29 @@ class LocalPostgresDatabase(Storage):
             cursor = connection.cursor()
             cursor.execute("SELECT * FROM players")
             return cursor.fetchall()
+        finally:
+            if connection is not None:
+                connection.close()
+
+    def get_player(self, player_name):
+        connection = self.__connect()
+
+        try:
+            cursor = connection.cursor()
+            cursor.execute(
+                "SELECT * FROM players WHERE name = %s", (player_name, ))
+
+            player = cursor.fetchall()
+
+            if not player:
+                cursor.execute(
+                    "INSERT INTO players (name, rating) VALUES (%s, %s)", (player_name, 1500))
+                connection.commit()
+                cursor.close()
+                return (player_name, 1500)
+            else:
+                cursor.close()
+                return (player[0][0], player[0][1])
         finally:
             if connection is not None:
                 connection.close()

@@ -1,40 +1,59 @@
-# Denis test
-def distribute_players_for_games(players):
-    games_count = 8
+import itertools
 
-    position_1 = [0, 0, 6, 6, 2, 2, 6, 6]
-    position_2 = [1, 4, 7, 0, 0, 4, 4, 2]
-    position_3 = [2, 1, 4, 7, 3, 3, 7, 7]
-    position_4 = [3, 5, 5, 1, 1, 5, 5, 3]
 
-    pairs1_list = []
-    pairs2_list = []
-    length_list = []
-    games_list = []
+def distribute_players_for_match(players):
+    players_in_game = [players[i]
+                       for i in range(4)]  # list of players in current game
+    players_number_in_game = [0, 1, 2, 3]  # list for creating permutation set
 
-    for i in range(games_count):
-        pare1 = ('{{ {} & {} }}'.format(
-            players[position_1[i]].name, players[position_2[i]].name))
-        pare2 = ('{{ {} & {} }}'.format(
-            players[position_3[i]].name, players[position_4[i]].name))
-        pairs1_list.append(pare1)
-        pairs2_list.append(pare2)
-        length_list.append(len(pare1))
-        length_list.append(len(pare2))
-        games_list.append('Game ' + str(i + 1))
+    # find rank balance between teams
+    team_rating_diff = abs((players_in_game[0].rating + players_in_game[1].rating) - (
+        players_in_game[2].rating + players_in_game[3].rating))
+    perm_set = itertools.permutations(players_number_in_game)
+    for i in perm_set:
+        local_team_rating_diff = abs(
+            (players[i[0]].rating + players[i[1]].rating) - (players[i[2]].rating + players[i[3]].rating))
+        if local_team_rating_diff <= team_rating_diff:
+            team_rating_diff = local_team_rating_diff
+            players_number_in_game.clear()
+            players_number_in_game = [j for j in i]
 
-    length_max = max(length_list)
+    # update games played in a row for each player in current match
+    for number in players_number_in_game:
+        players[number].games_played_in_a_row += 1
 
-    displayable_pairs_list = []
+    # update players in rest list
+    max_games = -1
+    go_rest_players_numbers_list = []
+    for _ in range(2):
+        for number in players_number_in_game:
+            if players[number].games_played_in_a_row > max_games:
+                max_games = players[number].games_played_in_a_row
+        for number in players_number_in_game:
+            if players[number].games_played_in_a_row == max_games:
+                go_rest_player = players_number_in_game.pop(
+                    players_number_in_game.index(number))
+                go_rest_players_numbers_list.append(go_rest_player)
+                break
 
-    for i in range(games_count):
-        displayable_pairs_list.append('-' * length_max)
-        steps1 = (length_max - len(pairs1_list[i])) // 2
-        displayable_pairs_list.append(' ' * steps1 + pairs1_list[i])
-        stepsG = (length_max - len(games_list[i])) // 2
-        displayable_pairs_list.append(' ' * stepsG + games_list[i])
-        steps2 = (length_max - len(pairs2_list[i])) // 2
-        displayable_pairs_list.append(' ' * steps2 + pairs2_list[i])
-        displayable_pairs_list.append('-' * length_max)
+    # find players with min games played in a row
+    two_min_games_count = []
+    all_games_count = [player.games_played_in_a_row for player in players]
+    for _ in range(2):
+        min_count = min(all_games_count)
+        two_min_games_count.append(all_games_count.pop(
+            all_games_count.index(min_count)))
 
-    return ("\n".join(displayable_pairs_list))
+    players_number_in_rest = [i for i in range(len(
+        players)) if i != players_number_in_game[0] and i != players_number_in_game[1]]
+
+    # update players in game list
+    while len(two_min_games_count) > 0:
+        for i in range(len(players_number_in_rest)):
+            if players[players_number_in_rest[i]].games_played_in_a_row == two_min_games_count[0]:
+                players_number_in_game.append(players_number_in_rest[i])
+                del two_min_games_count[0]
+                if len(two_min_games_count) == 0:
+                    break
+
+    return [players[players_number_in_game[i]] for i in range(4)]
