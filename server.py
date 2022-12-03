@@ -6,7 +6,7 @@ from flask import Flask, Response, request
 from flask_cors import CORS
 
 
-debug = True
+debug = False
 
 
 def run_server(storage, live_game):
