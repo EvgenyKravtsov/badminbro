@@ -5,7 +5,7 @@ import random
 def distribute_players_for_match(players):
     
     players_in_game = []  # list of players in current game
-    players_number_in_game = []  # list for creating permutation set
+    players_in_game_number = []  # list for creating permutation set
 
     # FIRST choose two played players
     played_players_number = [i for i in range(len(players)) if players[i].participation_in_the_last_game == True]
@@ -27,7 +27,7 @@ def distribute_players_for_match(players):
             j = len(played_players_number) - i - 1
             if players[played_players_number[j]].games_played_in_a_row == min_games_count[0]:
                 players_in_game.append(players[played_players_number[j]])
-                players_number_in_game.append(played_players_number.pop(j)) 
+                players_in_game_number.append(played_players_number.pop(j)) 
                 del min_games_count[0]
                 if len(min_games_count) == 0:
                     break
@@ -50,7 +50,7 @@ def distribute_players_for_match(players):
     while len(min_games_count) > 0:
         for i in range(len(fresh_players_number)):
             if players[fresh_players_number[i]].games_played_in_a_row == min_games_count[0]:
-                players_number_in_game.append(fresh_players_number[i])
+                players_in_game_number.append(fresh_players_number[i])
                 players_in_game.append(players[fresh_players_number[i]])
                 del min_games_count[0]
                 if len(min_games_count) == 0:
@@ -60,20 +60,20 @@ def distribute_players_for_match(players):
     # find rank balance between teams
     team_rating_diff = abs((players_in_game[0].rating + players_in_game[1].rating) - (
         players_in_game[2].rating + players_in_game[3].rating))
-    perm_set = itertools.permutations(players_number_in_game)
+    perm_set = itertools.permutations(players_in_game_number)
     for i in perm_set:
         local_team_rating_diff = abs(
             (players[i[0]].rating + players[i[1]].rating) - (players[i[2]].rating + players[i[3]].rating))
         if local_team_rating_diff <= team_rating_diff:
             team_rating_diff = local_team_rating_diff
-            players_number_in_game.clear()
-            players_number_in_game = [j for j in i]
+            players_in_game_number.clear()
+            players_in_game_number = [j for j in i]
 
     # update games played in a row for each player in current match
-    for number in players_number_in_game:
+    for number in players_in_game_number:
         players[number].games_played_in_a_row += 1
         players[number].participation_in_the_last_game = True
 
 
 
-    return [players[players_number_in_game[i]] for i in range(4)]
+    return [players[players_in_game_number[i]] for i in range(4)]
