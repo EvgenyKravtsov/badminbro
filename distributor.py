@@ -1,4 +1,5 @@
 import itertools
+import random
 
 
 def distribute_players_for_match(players):
@@ -8,6 +9,7 @@ def distribute_players_for_match(players):
 
     # FIRST choose two played players
     played_players_number = [i for i in range(len(players)) if players[i].participation_in_the_last_game == True]
+    random.shuffle(played_players_number) # Introduction of randomness
 
     # find players with min games played in a row
     min_games_count = []
@@ -35,6 +37,7 @@ def distribute_players_for_match(players):
 
     # SECOND choose fresh players
     fresh_players_number = [i for i in range(len(players)) if players[i].participation_in_the_last_game == False]
+    random.shuffle(fresh_players_number) # Introduction of randomness
 
     # find players with min games played in a row
     all_games_count.clear()
