@@ -15,9 +15,26 @@ class LiveGame:
             model.Player('G', 1233, 0),
             model.Player('H', 1513, 0),
         ]
+        self.active_match = []
+        self.played_matches = []
 
     def add_player(self, player):
         self.players.append(player)
 
     def start(self):
-        return distributor.distribute_players_for_match(self.players)
+        # return distributor.distribute_players_for_match(self.players)
+        active_match = self.players[0:4]
+        self.active_match.clear
+        self.active_match.extend(active_match)
+        return active_match
+
+    def next_match(self):
+        # return distributor.distribute_players_for_match(self.players)
+        played_match = []
+        for player in self.active_match:
+            played_match.append(player)
+        self.played_matches.append(played_match)
+        active_match = self.players[4:8]
+        self.active_match.clear()
+        self.active_match.extend(active_match)
+        return active_match

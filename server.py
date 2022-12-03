@@ -51,6 +51,14 @@ def run_server(storage, live_game):
         players_json = json.dumps([ob.__dict__ for ob in players])
         return Response(players_json, mimetype='application/json')
 
+    @app.route('/get_players_for_next_match')
+    def get_players_for_next_match():
+        active_match = live_game.next_match()
+        played_matches = live_game.played_matches
+        response = GetPlayersForNextMatchResponse(active_match, played_matches)
+        response_json = json.dumps(response, default=vars)
+        return Response(response_json, mimetype='application/json')
+
     if (debug):
         if __name__ == 'server':
             app.run(port=8000)
@@ -58,3 +66,9 @@ def run_server(storage, live_game):
         if __name__ == 'server':
             port = int(os.environ.get("PORT", 5000))
             app.run(host='0.0.0.0', port=port)
+
+
+class GetPlayersForNextMatchResponse:
+    def __init__(self, active_match, played_matches):
+        self.active_match = active_match
+        self.played_matches = played_matches
