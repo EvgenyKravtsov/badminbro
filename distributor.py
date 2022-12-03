@@ -6,7 +6,7 @@ def distribute_players_for_match(players):
     players_in_game = []  # list of players in current game
     players_number_in_game = []  # list for creating permutation set
 
-    # first choose two played players
+    # FIRST choose two played players
     played_players_number = [i for i in range(len(players)) if players[i].participation_in_the_last_game == True]
 
     # find players with min games played in a row
@@ -67,9 +67,6 @@ def distribute_players_for_match(players):
             players_number_in_game = [j for j in i]
 
     # update games played in a row for each player in current match
-    # for player in players:
-    #     player.participation_in_the_last_game = False
-
     for number in players_number_in_game:
         players[number].games_played_in_a_row += 1
         players[number].participation_in_the_last_game = True
