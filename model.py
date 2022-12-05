@@ -6,3 +6,6 @@ class Player:
         self.matches_won = matches_won
         self.games_played_in_a_row = games_played_in_a_row
         self.participation_in_the_last_game = participation_in_the_last_game
+
+    def __eq__(self, other):
+        return self.name == other.name

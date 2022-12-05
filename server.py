@@ -6,7 +6,7 @@ from flask import Flask, Response, request
 from flask_cors import CORS
 
 
-debug = False
+debug = True
 
 
 def run_server(storage, live_game):
@@ -38,6 +38,21 @@ def run_server(storage, live_game):
             playerFromStorage[0], playerFromStorage[1], playerFromStorage[2], playerFromStorage[3], playerFromStorage[4], playerFromStorage[5])
 
         live_game.add_player(player)
+
+        players_json = json.dumps([ob.__dict__ for ob in live_game.players])
+
+        return Response(players_json, mimetype='application/json')
+
+    @app.route('/remove_player_from_live_game')
+    def remove_player_from_live_game():
+        params = request.args
+        player_name_param = params.get('player_name')
+
+        playerFromStorage = storage.get_player(player_name_param)
+        player = model.Player(
+            playerFromStorage[0], playerFromStorage[1], playerFromStorage[2], playerFromStorage[3], playerFromStorage[4], playerFromStorage[5])
+
+        live_game.remove_player(player)
 
         players_json = json.dumps([ob.__dict__ for ob in live_game.players])
 
