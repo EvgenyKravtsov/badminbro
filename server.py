@@ -67,10 +67,17 @@ def run_server(storage, live_game):
     @app.route('/get_players_for_next_match')
     def get_players_for_next_match():
         params = request.args
-        winning_team_param = params.get('winning_team')
+        winning_team_param = int(params.get('winning_team'))
         ranking_engine.rank_players(
             live_game.active_match, winning_team_param, storage)  # 0 - left team won, 1 - right team won
-        active_match = live_game.next_match()
+        
+        winning_team = model.WinningTeam.LEFT_TEAM
+        if (winning_team_param == 0):
+            winning_team = model.WinningTeam.LEFT_TEAM
+        elif (winning_team_param == 1):
+            winning_team = model.WinningTeam.RIGHT_TEAM
+        active_match = live_game.next_match(winning_team)
+        
         played_matches = live_game.played_matches
         response = GetPlayersForNextMatchResponse(active_match, played_matches)
         response_json = json.dumps(response, default=vars)
