@@ -3,7 +3,7 @@ import live_game
 from server import run_server
 
 
-debug = True
+debug = False
 
 storage_instance = None
 if (debug):
