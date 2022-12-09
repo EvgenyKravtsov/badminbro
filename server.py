@@ -7,13 +7,18 @@ import ranking_engine
 
 debug = False
 
+CLIENTS = set()
+
 
 async def run_server(storage, game):
     async def handler(websocket, path):
+        CLIENTS.add(websocket)
         while True:
             data = await websocket.recv()
             reply = __handle_message_from_client(data)
-            await websocket.send(reply)
+            # await websocket.send(reply)
+            for client in CLIENTS:
+                asyncio.create_task(client.send(reply))
 
     def __handle_message_from_client(message):
         messageComponents = message.split(':')
