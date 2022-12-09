@@ -4,7 +4,7 @@ import game
 import server
 
 
-debug = True
+debug = False
 
 storage_implementation = None
 if (debug):

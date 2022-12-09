@@ -5,7 +5,7 @@ import json
 import model
 import ranking_engine
 
-debug = True
+debug = False
 
 
 async def run_server(storage, game):
