@@ -1,8 +1,11 @@
+import os
 import asyncio
 import websockets
 import json
 import model
 import ranking_engine
+
+debug = True
 
 
 async def run_server(storage, game):
@@ -66,10 +69,10 @@ async def run_server(storage, game):
                 game_json = json.dumps(game, default=vars)
                 return game_json
 
-    async with websockets.serve(handler, "localhost", 8000):
-        await asyncio.Future()
-
-    # start_server = websockets.serve(handler, "localhost", 8000)
-
-    # asyncio.get_event_loop().run_until_complete(start_server)
-    # asyncio.get_event_loop().run_forever()
+    if (debug):
+        async with websockets.serve(handler, 'localhost', 8000):
+            await asyncio.Future()
+    else:
+        port = int(os.environ.get('PORT', 5000))
+        async with websockets.serve(handler, '0.0.0.0', port):
+            await asyncio.Future()
