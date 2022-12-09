@@ -1,14 +1,17 @@
+import asyncio
 import storage
-import live_game
-from server import run_server
+import game
+import server
 
 
-debug = False
+debug = True
 
-storage_instance = None
+storage_implementation = None
 if (debug):
-    storage_instance = storage.LocalPostgresDatabase()
+    storage_implementation = storage.LocalPostgresDatabase()
 else:
-    storage_instance = storage.HerokuPostgresDatabase()
-live_game = live_game.LiveGame()
-run_server(storage_instance, live_game)
+    storage_implementation = storage.HerokuPostgresDatabase()
+game = game.Game()
+# server.run_server(storage_instance, live_game)
+
+asyncio.run(server.run_server(storage_implementation, game))

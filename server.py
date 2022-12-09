@@ -1,113 +1,75 @@
+import asyncio
+import websockets
 import json
-import os
 import model
 import ranking_engine
-from flask import Flask, Response, request
-from flask_cors import CORS
 
 
-debug = False
+async def run_server(storage, game):
+    async def handler(websocket, path):
+        while True:
+            data = await websocket.recv()
+            reply = __handle_message_from_client(data)
+            await websocket.send(reply)
 
+    def __handle_message_from_client(message):
+        messageComponents = message.split(':')
+        event = messageComponents[0]
+        if (len(messageComponents) > 1):
+            parameter = message.split(':')[1]
+        match event:
+            case 'init':
+                players_cursor = storage.get_players()
+                keys = ['name', 'rating', 'matches_played', 'matches_won']
 
-def run_server(storage, live_game):
-    app = Flask(__name__)
-    CORS(app)
+                data = [dict(zip(keys, user)) for user in players_cursor]
+                players_json = json.dumps(data, indent=4)
 
-    @app.route('/')
-    def get_players_ratings():
-        players_cursor = storage.get_players()
-        keys = ['name', 'rating', 'matches_played', 'matches_won']
+                return players_json
+            case 'get_game':
+                game_json = json.dumps(game, default=vars)
+                return game_json
+            case 'add_player_to_game':
+                playerFromStorage = storage.get_player(parameter)
+                player = model.Player(playerFromStorage[0], playerFromStorage[1], playerFromStorage[2],
+                                      playerFromStorage[3], playerFromStorage[4], playerFromStorage[5])
 
-        data = [dict(zip(keys, user)) for user in players_cursor]
-        players_json = json.dumps(data, indent=4)
+                game.add_player(player)
 
-        return Response(players_json, mimetype='application/json')
+                game_json = json.dumps(game, default=vars)
+                return game_json
+            case 'remove_player_from_game':
+                playerFromStorage = storage.get_player(parameter)
+                player = model.Player(playerFromStorage[0], playerFromStorage[1], playerFromStorage[2],
+                                      playerFromStorage[3], playerFromStorage[4], playerFromStorage[5])
 
-    @app.route('/get_live_game')
-    def get_live_game():
-        live_game_json = json.dumps(live_game, default=vars)
-        return Response(live_game_json, mimetype='application/json')
+                game.remove_player(player)
 
-    @app.route('/add_player_to_live_game')
-    def add_player_to_live_game():
-        params = request.args
-        player_name_param = params.get('player_name')
+                game_json = json.dumps(game, default=vars)
+                return game_json
+            case 'start_game':
+                game.start()
+                game_json = json.dumps(game, default=vars)
+                return game_json
+            case 'get_next_match':
+                winning_team_param = int(parameter)
+                ranking_engine.rank_players(
+                    game.active_match, winning_team_param, storage)  # 0 - left team won, 1 - right team won
 
-        playerFromStorage = storage.get_player(player_name_param)
-        player = model.Player(
-            playerFromStorage[0], playerFromStorage[1], playerFromStorage[2], playerFromStorage[3], playerFromStorage[4], playerFromStorage[5])
+                winning_team = model.WinningTeam.LEFT_TEAM
+                if (winning_team_param == 0):
+                    winning_team = model.WinningTeam.LEFT_TEAM
+                elif (winning_team_param == 1):
+                    winning_team = model.WinningTeam.RIGHT_TEAM
+                game.get_next_match(winning_team)
 
-        live_game.add_player(player)
+                game_json = json.dumps(game, default=vars)
+                return game_json
 
-        players_json = json.dumps([ob.__dict__ for ob in live_game.players])
+    async with websockets.serve(handler, "localhost", 8000):
+        await asyncio.Future()
 
-        return Response(players_json, mimetype='application/json')
+    # start_server = websockets.serve(handler, "localhost", 8000)
 
-    @app.route('/remove_player_from_live_game')
-    def remove_player_from_live_game():
-        params = request.args
-        player_name_param = params.get('player_name')
-
-        playerFromStorage = storage.get_player(player_name_param)
-        player = model.Player(
-            playerFromStorage[0], playerFromStorage[1], playerFromStorage[2], playerFromStorage[3], playerFromStorage[4], playerFromStorage[5])
-
-        live_game.remove_player(player)
-
-        players_json = json.dumps([ob.__dict__ for ob in live_game.players])
-
-        return Response(players_json, mimetype='application/json')
-
-    @app.route('/start_live_game')
-    def start_live_game():
-        active_match = live_game.start()
-        next_match = live_game.next_match
-
-        response = StartLiveGameResponse(
-            active_match=active_match, next_match=next_match)
-        response_json = json.dumps(response, default=vars)
-        return Response(response_json, mimetype='application/json')
-
-    @app.route('/get_players_for_next_match')
-    def get_players_for_next_match():
-        params = request.args
-        winning_team_param = int(params.get('winning_team'))
-        ranking_engine.rank_players(
-            live_game.active_match, winning_team_param, storage)  # 0 - left team won, 1 - right team won
-
-        winning_team = model.WinningTeam.LEFT_TEAM
-        if (winning_team_param == 0):
-            winning_team = model.WinningTeam.LEFT_TEAM
-        elif (winning_team_param == 1):
-            winning_team = model.WinningTeam.RIGHT_TEAM
-        active_match = live_game.get_next_match(winning_team)
-
-        next_match = live_game.next_match
-
-        played_matches = live_game.played_matches
-
-        response = GetPlayersForNextMatchResponse(
-            active_match=active_match, next_match=next_match, played_matches=played_matches)
-        response_json = json.dumps(response, default=vars)
-        return Response(response_json, mimetype='application/json')
-
-    if (debug):
-        if __name__ == 'server':
-            app.run(port=8000)
-    else:
-        if __name__ == 'server':
-            port = int(os.environ.get("PORT", 5000))
-            app.run(host='0.0.0.0', port=port)
-
-
-class StartLiveGameResponse:
-    def __init__(self, active_match, next_match):
-        self.active_match = active_match
-        self.next_match = next_match
-
-
-class GetPlayersForNextMatchResponse:
-    def __init__(self, active_match, next_match, played_matches):
-        self.active_match = active_match
-        self.next_match = next_match
-        self.played_matches = played_matches
+    # asyncio.get_event_loop().run_until_complete(start_server)
+    # asyncio.get_event_loop().run_forever()
