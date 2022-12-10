@@ -4,25 +4,25 @@ import model
 
 class Game:
     def __init__(self):
-        self.players = []
-        # self.players = [
-        #     model.Player(name='A', rating=1500, matches_played=0, matches_won=0,
-        #                  games_played_in_a_row=0, participation_in_the_last_game=False),
-        #     model.Player(name='B', rating=1500, matches_played=0, matches_won=0,
-        #                  games_played_in_a_row=0, participation_in_the_last_game=False),
-        #     model.Player(name='C', rating=1500, matches_played=0, matches_won=0,
-        #                  games_played_in_a_row=0, participation_in_the_last_game=False),
-        #     model.Player(name='D', rating=1500, matches_played=0, matches_won=0,
-        #                  games_played_in_a_row=0, participation_in_the_last_game=False),
-        #     model.Player(name='E', rating=1500, matches_played=0, matches_won=0,
-        #                  games_played_in_a_row=0, participation_in_the_last_game=False),
-        #     model.Player(name='F', rating=1500, matches_played=0, matches_won=0,
-        #                  games_played_in_a_row=0, participation_in_the_last_game=False),
-        #     model.Player(name='G', rating=1500, matches_played=0, matches_won=0,
-        #                  games_played_in_a_row=0, participation_in_the_last_game=False),
-        #     model.Player(name='H', rating=1500, matches_played=0, matches_won=0,
-        #                  games_played_in_a_row=0, participation_in_the_last_game=False),
-        # ]
+        # self.players = []
+        self.players = [
+            model.Player(name='A', rating=1500, matches_played=0, matches_won=0,
+                         games_played_in_a_row=0, participation_in_the_last_game=False),
+            model.Player(name='B', rating=1500, matches_played=0, matches_won=0,
+                         games_played_in_a_row=0, participation_in_the_last_game=False),
+            model.Player(name='C', rating=1500, matches_played=0, matches_won=0,
+                         games_played_in_a_row=0, participation_in_the_last_game=False),
+            model.Player(name='D', rating=1500, matches_played=0, matches_won=0,
+                         games_played_in_a_row=0, participation_in_the_last_game=False),
+            model.Player(name='E', rating=1500, matches_played=0, matches_won=0,
+                         games_played_in_a_row=0, participation_in_the_last_game=False),
+            model.Player(name='F', rating=1500, matches_played=0, matches_won=0,
+                         games_played_in_a_row=0, participation_in_the_last_game=False),
+            model.Player(name='G', rating=1500, matches_played=0, matches_won=0,
+                         games_played_in_a_row=0, participation_in_the_last_game=False),
+            model.Player(name='H', rating=1500, matches_played=0, matches_won=0,
+                         games_played_in_a_row=0, participation_in_the_last_game=False),
+        ]
         self.active_match = []
         self.next_match = []
         self.played_matches = []

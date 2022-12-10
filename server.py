@@ -15,25 +15,38 @@ async def run_server(storage, game):
         CLIENTS.add(websocket)
         while True:
             data = await websocket.recv()
-            reply = __handle_message_from_client(data)
-            # await websocket.send(reply)
+            reply = __handle_message_from_client(data, path)
             for client in CLIENTS:
                 asyncio.create_task(client.send(reply))
 
-    def __handle_message_from_client(message):
+    def __handle_message_from_client(message, path):
         messageComponents = message.split(':')
         event = messageComponents[0]
         if (len(messageComponents) > 1):
             parameter = message.split(':')[1]
         match event:
             case 'init':
-                players_cursor = storage.get_players()
-                keys = ['name', 'rating', 'matches_played', 'matches_won']
+                admin = False
+                if 'admin' in path:
+                    admin = True
 
-                data = [dict(zip(keys, user)) for user in players_cursor]
-                players_json = json.dumps(data, indent=4)
+                playersFromStorage = storage.get_players()
 
-                return players_json
+                players = []
+                for playerFromStorage in playersFromStorage:
+                    players.append(model.Player(playerFromStorage[0], playerFromStorage[1], playerFromStorage[2],
+                                                playerFromStorage[3], 0, False))
+
+                initResponse = InitResponse(admin, players)
+                v = json.dumps(initResponse, default=vars)
+                return json.dumps(initResponse, default=vars)
+                # players_cursor = storage.get_players()
+                # keys = ['name', 'rating', 'matches_played', 'matches_won']
+
+                # data = [dict(zip(keys, user)) for user in players_cursor]
+                # players_json = json.dumps(data, indent=4)
+
+                # return players_json
             case 'get_game':
                 game_json = json.dumps(game, default=vars)
                 return game_json
@@ -81,3 +94,9 @@ async def run_server(storage, game):
         port = int(os.environ.get('PORT', 5000))
         async with websockets.serve(handler, '0.0.0.0', port):
             await asyncio.Future()
+
+
+class InitResponse:
+    def __init__(self, admin, players):
+        self.admin = admin
+        self.players = players
